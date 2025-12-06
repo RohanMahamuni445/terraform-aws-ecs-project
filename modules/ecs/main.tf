@@ -15,7 +15,7 @@ resource "aws_security_group" "ecs_sg" {
   }
 }
 
-# Allow traffic from ALB
+# Allow ALB to reach ECS tasks
 resource "aws_security_group_rule" "allow_alb" {
   type                     = "ingress"
   from_port                = 80

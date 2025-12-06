@@ -42,6 +42,9 @@ resource "aws_lb_target_group" "terra_tg" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
+  # IMPORTANT FIX FOR FARGATE / awsvpc
+  target_type = "ip"
+
   health_check {
     path                = "/"
     healthy_threshold   = 2
