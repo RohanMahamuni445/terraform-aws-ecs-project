@@ -1,6 +1,5 @@
 variable "project_name" {
   type = string
-  default = "terraform-project-dev"
 }
 
 variable "vpc_id" {
@@ -19,9 +18,11 @@ variable "container_image" {
   type = string
 }
 
-variable "ecs_security_group_id" {
+variable "alb_security_group_id" {
   type = string
 }
-variable "alb_security_groupe_id" {
-  
+
+variable "alb_tg_arn" {
+  type = string
 }
+

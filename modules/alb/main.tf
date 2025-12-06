@@ -1,9 +1,8 @@
 resource "aws_security_group" "terra_sg_alb" {
-    name = "terra_alb_sg"
-    description = "sg for alb"
-    vpc_id = var.vpc_id
+  name        = "${var.project_name}-alb-sg"
+  description = "Security group for ALB"
+  vpc_id      = var.vpc_id
 
-    
   ingress {
     from_port   = 80
     to_port     = 80
@@ -23,33 +22,28 @@ resource "aws_security_group" "terra_sg_alb" {
   }
 }
 
-locals {
-  alb_security_group_id = var.create_alb_sg ? aws_security_group.alb_sg[0].id : var.alb_security_group_id
-}
-  
-
 resource "aws_lb" "terraapp" {
-  name = "${var.project_name}-alb"
-  internal = false
+  name               = "${var.project_name}-alb"
+  internal           = false
   load_balancer_type = "application"
-  security_groups = [local.alb_security_group_id]
-  subnets =  var.public_subnet_ids
+  security_groups    = [aws_security_group.terra_sg_alb.id]
+  subnets            = var.public_subnet_ids
 
   enable_deletion_protection = false
 
   tags = {
-    name = "${var.project_name}-alb"
+    Name = "${var.project_name}-alb"
   }
 }
 
-resource "aws_lb_target_group" "terra-tg" {
+resource "aws_lb_target_group" "terra_tg" {
   name     = "${var.project_name}-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
   health_check {
-    path                = "/" 
+    path                = "/"
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
@@ -63,12 +57,13 @@ resource "aws_lb_target_group" "terra-tg" {
 }
 
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.app.arn
+  load_balancer_arn = aws_lb.terraapp.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.terra-tg.arn
+    target_group_arn = aws_lb_target_group.terra_tg.arn
   }
 }
+
